@@ -1,4 +1,4 @@
-import { trustedBy } from '@/components/landing/content'
+import { trustedBy } from '@/components/landing/TrustedBy.config'
 
 export let TrustedBy: React.FC = () => {
   return (

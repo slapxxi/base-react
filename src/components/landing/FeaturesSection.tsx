@@ -1,4 +1,4 @@
-import { features } from '@/components/landing/content'
+import { features } from '@/components/landing/FeaturesSection.config'
 
 export let FeaturesSection: React.FC = () => {
   return (

@@ -1,3 +1,6 @@
+export * from '@/components/admin'
+export * from '@/components/auth'
 export * from '@/components/Badge'
 export * from '@/components/Input'
 export * from '@/components/landing'
+export * from '@/components/NotFoundPage'

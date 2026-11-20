@@ -1,5 +1,6 @@
-import { navLinks } from '@/components/landing/content'
+import { navLinks } from '@/components/landing/SiteHeader.config'
 import { LogoIcon } from '@/components/landing/icons'
+import { Link } from 'react-router-dom'
 
 export let SiteHeader: React.FC = () => {
   return (
@@ -21,6 +22,12 @@ export let SiteHeader: React.FC = () => {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link
+            to="/admin"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-950"
+          >
+            Admin
+          </Link>
           <a
             href="#showcase"
             className="hidden rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-950 sm:block"

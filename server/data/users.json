@@ -1,0 +1,10 @@
+[
+  {
+    "id": "ed4e93a6a2142da24ce64faa0fbd4241",
+    "email": "admin@example.com",
+    "role": "admin",
+    "password_hash": "$2a$10$ZLZ.PbqC1JRUPfJQnKfjfOu5C.5S5teuRm3mW9kXL8oeOLrXBHyYq",
+    "created_at": "2026-11-20T06:24:17.850482868Z"
+  }
+]
+

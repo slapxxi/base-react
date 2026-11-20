@@ -1,5 +1,5 @@
 import { CodeShowcase } from '@/components/landing/CodeShowcase'
-import { primaryButton, secondaryButton } from '@/components/landing/content'
+import { primaryButton, secondaryButton } from '@/components/landing/HeroSection.config'
 
 export let HeroSection: React.FC = () => {
   return (

@@ -1,12 +1,5 @@
 import { CodeIcon, FeatherIcon, LayersIcon, MoonIcon, PaletteIcon, ShieldIcon } from '@/components/landing/icons'
 
-export let navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'Showcase', href: '#showcase' },
-  { label: 'Community', href: '#community' },
-  { label: 'Docs', href: '#docs' },
-]
-
 export let features = [
   {
     title: 'Composable primitives',
@@ -39,13 +32,3 @@ export let features = [
     icon: CodeIcon,
   },
 ]
-
-export let trustedBy = ['Northwind', 'Acme Co', 'Globex', 'Initech', 'Umbrella']
-
-export let installCommand = 'npm install orbit-ui'
-
-export let primaryButton =
-  'inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
-
-export let secondaryButton =
-  'inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'

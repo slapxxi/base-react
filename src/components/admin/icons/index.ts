@@ -1,0 +1,5 @@
+export * from '@/components/admin/icons/GridIcon'
+export * from '@/components/admin/icons/LogoutIcon'
+export * from '@/components/admin/icons/MenuIcon'
+export * from '@/components/admin/icons/SettingsIcon'
+export * from '@/components/admin/icons/UsersIcon'
