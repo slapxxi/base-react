@@ -1,10 +1,10 @@
 type BadgeProps = React.ComponentProps<'span'> & {}
 
-export let Badge: React.FC<BadgeProps> = (props) => {
+export let Badge: React.FC<BadgeProps> = ({ className = '', ...props }) => {
   return (
     <span
-      className="absolute col-[2/3] row-[1/2] inline-grid grid-cols-[minmax(20px,auto)] grid-rows-[minmax(20px,auto)] 
-      place-items-center justify-self-end rounded-full bg-red-500 p-px text-xs font-bold text-white"
+      className={`inline-flex min-w-5 items-center justify-center rounded-full 
+        bg-red-500 px-1.5 py-0.5 text-xs font-bold text-white ${className}`.trim()}
       {...props}
     />
   )
