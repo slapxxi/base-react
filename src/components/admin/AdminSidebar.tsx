@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom'
 import { links } from '@/components/admin/AdminSidebar.config'
 import { LogoIcon } from '@/components/landing/icons'
+import { NavLink } from 'react-router-dom'
 
 type AdminSidebarProps = {
   open: boolean
@@ -20,9 +20,9 @@ export let AdminSidebar: React.FC<AdminSidebarProps> = ({ open, onClose }) => {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform lg:static lg:translate-x-0 ${
-          open ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`${open ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-40 flex w-64 flex-col
+          border-r border-slate-200 bg-white transition-transform lg:static
+        lg:translate-x-0`}
       >
         <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-6 text-lg font-bold tracking-tight">
           <span className="grid size-8 place-items-center rounded-lg bg-slate-900 text-white">

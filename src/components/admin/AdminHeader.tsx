@@ -6,7 +6,7 @@ type AdminHeaderProps = {
 }
 
 export let AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
-  let { user, logout } = useAuth()
+  let { user, logout, isLoggingOut } = useAuth()
 
   return (
     <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-6 backdrop-blur">
@@ -32,7 +32,8 @@ export let AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenSidebar }) => {
         <button
           type="button"
           onClick={() => void logout()}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+          disabled={isLoggingOut}
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <LogoutIcon className="size-4" />
           Sign out

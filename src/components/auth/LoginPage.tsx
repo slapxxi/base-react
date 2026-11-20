@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Navigate, useLocation } from 'react-router-dom'
@@ -16,9 +15,8 @@ import { useAuth } from '@/lib/auth/useAuth'
 import type { LoginFormValues } from '@/components/auth/LoginPage.config'
 
 export let LoginPage: React.FC = () => {
-  let { user, status, login } = useAuth()
+  let { user, status, login, loginError, isLoggingIn } = useAuth()
   let location = useLocation()
-  let [error, setError] = useState('')
   let {
     register,
     handleSubmit,
@@ -29,6 +27,7 @@ export let LoginPage: React.FC = () => {
   })
 
   let from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/admin'
+  let signInError = loginError ? loginError.message || fallbackSignInError : ''
 
   if (status === 'loading') {
     return (
@@ -43,13 +42,9 @@ export let LoginPage: React.FC = () => {
   }
 
   let onSubmit = async (values: LoginFormValues) => {
-    setError('')
-
     try {
       await login(values.email, values.password)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : fallbackSignInError)
-    }
+    } catch {}
   }
 
   return (
@@ -134,17 +129,21 @@ export let LoginPage: React.FC = () => {
               )}
             </div>
 
-            {error && (
+            {signInError && (
               <div
                 className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                 role="alert"
               >
-                {error}
+                {signInError}
               </div>
             )}
 
-            <button type="submit" disabled={isSubmitting} className={submitButtonClassName}>
-              {isSubmitting ? signInLabels.submitting : signInLabels.idle}
+            <button
+              type="submit"
+              disabled={isSubmitting || isLoggingIn}
+              className={submitButtonClassName}
+            >
+              {isSubmitting || isLoggingIn ? signInLabels.submitting : signInLabels.idle}
             </button>
           </form>
 

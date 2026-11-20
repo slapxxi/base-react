@@ -8,6 +8,9 @@ export type AuthContextValue = {
   status: AuthStatus
   login: (email: string, password: string) => Promise<AuthUser>
   logout: () => Promise<void>
+  loginError: Error | null
+  isLoggingIn: boolean
+  isLoggingOut: boolean
 }
 
 export let authContext = createContext<AuthContextValue | null>(null)

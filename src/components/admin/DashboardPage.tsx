@@ -1,26 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import {
+  overviewFallbackError,
+  overviewQueryOptions,
+} from '@/components/admin/DashboardPage.config'
 import { StatCard } from '@/components/admin/StatCard'
-import { ApiError, fetchAdminOverview } from '@/lib/auth/api'
-import type { AdminOverview } from '@/lib/auth/types'
-import { useAuth } from '@/lib/auth/useAuth'
 
 export let DashboardPage: React.FC = () => {
-  let { logout } = useAuth()
-  let [overview, setOverview] = useState<AdminOverview | null>(null)
-  let [error, setError] = useState('')
+  let { data: overview, error } = useQuery(overviewQueryOptions)
 
-  useEffect(() => {
-    fetchAdminOverview()
-      .then(setOverview)
-      .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 401) {
-          void logout()
-          return
-        }
-        setError(err instanceof Error ? err.message : 'Unable to load overview')
-      })
-  }, [logout])
+  let errorMessage = error instanceof Error ? error.message : overviewFallbackError
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -30,15 +19,30 @@ export let DashboardPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          {error}
+        <div
+          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          role="alert"
+        >
+          {errorMessage}
         </div>
       )}
 
       <div className="mt-8 grid gap-5 sm:grid-cols-3">
-        <StatCard label="Accounts" value={overview?.users ?? '—'} hint="Total users in the auth store" />
-        <StatCard label="Administrators" value={overview?.admins ?? '—'} hint="Users with admin access" />
-        <StatCard label="Auth service" value={overview?.service ?? '—'} hint="Go service behind this panel" />
+        <StatCard
+          label="Accounts"
+          value={overview?.users ?? '—'}
+          hint="Total users in the auth store"
+        />
+        <StatCard
+          label="Administrators"
+          value={overview?.admins ?? '—'}
+          hint="Users with admin access"
+        />
+        <StatCard
+          label="Auth service"
+          value={overview?.service ?? '—'}
+          hint="Go service behind this panel"
+        />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">

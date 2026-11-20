@@ -1,53 +1,61 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
+import { sessionQueryOptions } from '@/components/auth/AuthProvider.config'
+import { loginRequest, logoutRequest } from '@/lib/auth/api'
 import { authContext } from '@/lib/auth/authContext'
-import { fetchCurrentUser, loginRequest, logoutRequest } from '@/lib/auth/api'
+import { clearSession, setSession } from '@/lib/auth/session'
 import type { AuthStatus } from '@/lib/auth/authContext'
-import type { AuthUser } from '@/lib/auth/types'
 
 type AuthProviderProps = {
   children: React.ReactNode
 }
 
 export let AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  let [user, setUser] = useState<AuthUser | null>(null)
-  let [status, setStatus] = useState<AuthStatus>('loading')
+  let queryClient = useQueryClient()
+  let sessionQuery = useQuery(sessionQueryOptions)
 
-  useEffect(() => {
-    let active = true
+  let {
+    mutateAsync: loginUser,
+    error: loginError,
+    isPending: isLoggingIn,
+  } = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      loginRequest(email, password),
+    onSuccess: (currentUser) => {
+      setSession(queryClient, currentUser)
+    },
+  })
 
-    fetchCurrentUser()
-      .then((currentUser) => {
-        if (active) {
-          setUser(currentUser)
-          setStatus('authenticated')
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setUser(null)
-          setStatus('unauthenticated')
-        }
-      })
+  let { mutateAsync: logoutUser, isPending: isLoggingOut } = useMutation({
+    mutationFn: logoutRequest,
+    onSettled: () => {
+      clearSession(queryClient)
+    },
+  })
 
-    return () => {
-      active = false
-    }
-  }, [])
-
-  let login = useCallback(async (email: string, password: string) => {
-    let currentUser = await loginRequest(email, password)
-    setUser(currentUser)
-    setStatus('authenticated')
-    return currentUser
-  }, [])
+  let login = useCallback(
+    (email: string, password: string) => loginUser({ email, password }),
+    [loginUser],
+  )
 
   let logout = useCallback(async () => {
-    await logoutRequest()
-    setUser(null)
-    setStatus('unauthenticated')
-  }, [])
+    try {
+      await logoutUser()
+    } catch {}
+  }, [logoutUser])
+
+  let user = sessionQuery.data ?? null
+  let status: AuthStatus = sessionQuery.isPending
+    ? 'loading'
+    : user
+      ? 'authenticated'
+      : 'unauthenticated'
 
   return (
-    <authContext.Provider value={{ user, status, login, logout }}>{children}</authContext.Provider>
+    <authContext.Provider
+      value={{ user, status, login, logout, loginError, isLoggingIn, isLoggingOut }}
+    >
+      {children}
+    </authContext.Provider>
   )
 }

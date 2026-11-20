@@ -1,27 +1,15 @@
-import { useEffect, useState } from 'react'
-import { dateFormatter, userIdPreviewLength } from '@/components/admin/UsersPage.config'
-import { ApiError, fetchAdminUsers } from '@/lib/auth/api'
-import type { AuthUser } from '@/lib/auth/types'
-import { useAuth } from '@/lib/auth/useAuth'
+import { useQuery } from '@tanstack/react-query'
+import {
+  dateFormatter,
+  userIdPreviewLength,
+  usersFallbackError,
+  usersQueryOptions,
+} from '@/components/admin/UsersPage.config'
 
 export let UsersPage: React.FC = () => {
-  let { logout } = useAuth()
-  let [users, setUsers] = useState<AuthUser[]>([])
-  let [loading, setLoading] = useState(true)
-  let [error, setError] = useState('')
+  let { data: users = [], error, isPending } = useQuery(usersQueryOptions)
 
-  useEffect(() => {
-    fetchAdminUsers()
-      .then(setUsers)
-      .catch((err: unknown) => {
-        if (err instanceof ApiError && err.status === 401) {
-          void logout()
-          return
-        }
-        setError(err instanceof Error ? err.message : 'Unable to load users')
-      })
-      .finally(() => setLoading(false))
-  }, [logout])
+  let errorMessage = error instanceof Error ? error.message : usersFallbackError
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -31,8 +19,11 @@ export let UsersPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
-          {error}
+        <div
+          className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          role="alert"
+        >
+          {errorMessage}
         </div>
       )}
 
@@ -58,14 +49,18 @@ export let UsersPage: React.FC = () => {
                 <td className="px-6 py-4 text-slate-500">
                   {dateFormatter.format(new Date(user.createdAt))}
                 </td>
-                <td className="px-6 py-4 font-mono text-xs text-slate-400">{user.id.slice(0, userIdPreviewLength)}…</td>
+                <td className="px-6 py-4 font-mono text-xs text-slate-400">
+                  {user.id.slice(0, userIdPreviewLength)}…
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        {loading && <p className="px-6 py-10 text-center text-sm text-slate-500">Loading accounts…</p>}
-        {!loading && users.length === 0 && !error && (
+        {isPending && (
+          <p className="px-6 py-10 text-center text-sm text-slate-500">Loading accounts…</p>
+        )}
+        {!isPending && users.length === 0 && !error && (
           <p className="px-6 py-10 text-center text-sm text-slate-500">No accounts found.</p>
         )}
       </div>
