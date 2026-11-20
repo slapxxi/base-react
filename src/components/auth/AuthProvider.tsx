@@ -47,5 +47,7 @@ export let AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setStatus('unauthenticated')
   }, [])
 
-  return <authContext.Provider value={{ user, status, login, logout }}>{children}</authContext.Provider>
+  return (
+    <authContext.Provider value={{ user, status, login, logout }}>{children}</authContext.Provider>
+  )
 }

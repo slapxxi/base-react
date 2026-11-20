@@ -87,17 +87,100 @@ func TestRequestLogging(t *testing.T) {
 	defer log.SetOutput(original)
 
 	recorder := httptest.NewRecorder()
-	NewServer(cfg, store).Handler().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/api/health", nil))
+	request := httptest.NewRequest(http.MethodGet, "/api/health?debug=true", nil)
+	request.Header.Set("Origin", cfg.AllowedOrigin)
+	NewServer(cfg, store).Handler().ServeHTTP(recorder, request)
 
 	if recorder.Code != http.StatusOK {
 		t.Fatalf("status = %d, want %d", recorder.Code, http.StatusOK)
 	}
+	requestID := recorder.Header().Get("X-Request-ID")
+	if requestID == "" {
+		t.Fatal("missing X-Request-ID response header")
+	}
+	if exposed := recorder.Header().Get("Access-Control-Expose-Headers"); !strings.Contains(exposed, "X-Request-ID") {
+		t.Errorf("Access-Control-Expose-Headers = %q, want X-Request-ID", exposed)
+	}
 
 	logged := output.String()
-	for _, fragment := range []string{"method=GET", "path=/api/health", "status=200", "duration="} {
+	for _, fragment := range []string{
+		"method=GET",
+		"path=/api/health",
+		"status=200",
+		"duration=",
+		"query=debug=true",
+		"request_id=" + requestID,
+	} {
 		if !strings.Contains(logged, fragment) {
 			t.Errorf("log output %q does not contain %q", logged, fragment)
 		}
+	}
+}
+
+func TestRequestLoggingReusesRequestID(t *testing.T) {
+	cfg := Config{
+		DBPath:        filepath.Join(t.TempDir(), "users.json"),
+		JWTSecret:     []byte("a-test-secret-that-is-at-least-32-bytes-long"),
+		AllowedOrigin: "http://localhost:5173",
+		TokenTTL:      time.Hour,
+	}
+	store, err := OpenStore(cfg.DBPath)
+	if err != nil {
+		t.Fatalf("open store: %v", err)
+	}
+
+	var output bytes.Buffer
+	original := log.Writer()
+	log.SetOutput(&output)
+	defer log.SetOutput(original)
+
+	recorder := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodGet, "/api/health", nil)
+	request.Header.Set("X-Request-ID", "test-request-123")
+	NewServer(cfg, store).Handler().ServeHTTP(recorder, request)
+
+	if got := recorder.Header().Get("X-Request-ID"); got != "test-request-123" {
+		t.Errorf("X-Request-ID = %q, want %q", got, "test-request-123")
+	}
+	if logged := output.String(); !strings.Contains(logged, "request_id=test-request-123") {
+		t.Errorf("log output %q does not contain reused request ID", logged)
+	}
+}
+
+func TestRequestIDFor(t *testing.T) {
+	if got, want := requestIDFor("  abc\n123  "), "abc-123"; got != want {
+		t.Errorf("requestIDFor() = %q, want %q", got, want)
+	}
+	if got := requestIDFor(""); len(got) != 16 {
+		t.Errorf("generated request ID length = %d, want 16", len(got))
+	}
+	long := strings.Repeat("a", 100)
+	if got := requestIDFor(long); len([]rune(got)) != maxRequestIDLength {
+		t.Errorf("capped request ID length = %d, want %d", len([]rune(got)), maxRequestIDLength)
+	}
+}
+
+func TestColorEnabled(t *testing.T) {
+	original := log.Writer()
+	defer log.SetOutput(original)
+
+	var output bytes.Buffer
+	log.SetOutput(&output)
+
+	t.Setenv("CLICOLOR_FORCE", "")
+	t.Setenv("NO_COLOR", "1")
+	if colorEnabled() {
+		t.Error("colorEnabled() = true with NO_COLOR, want false")
+	}
+
+	t.Setenv("NO_COLOR", "")
+	if colorEnabled() {
+		t.Error("colorEnabled() = true with non-file log writer, want false")
+	}
+
+	t.Setenv("CLICOLOR_FORCE", "1")
+	if !colorEnabled() {
+		t.Error("colorEnabled() = false with CLICOLOR_FORCE, want true")
 	}
 }
 

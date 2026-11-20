@@ -36,15 +36,18 @@ func run(args []string) error {
 	}
 
 	switch args[0] {
+
 	case "serve":
 		if len(args) != 1 {
 			return errors.New("usage: server serve")
 		}
 		return serve(cfg, store)
+
 	case "create-user":
 		if len(args) != 3 {
 			return errors.New("usage: server create-user <email> <password|->")
 		}
+
 		password := args[2]
 		if password == "-" {
 			data, err := io.ReadAll(os.Stdin)
@@ -53,12 +56,15 @@ func run(args []string) error {
 			}
 			password = strings.TrimRight(string(data), "\r\n")
 		}
+
 		user, err := store.CreateUser(args[1], password)
 		if err != nil {
 			return err
 		}
+
 		fmt.Printf("created admin %s (%s)\n", user.Email, user.ID)
 		return nil
+
 	default:
 		return fmt.Errorf("unknown command %q", args[0])
 	}
