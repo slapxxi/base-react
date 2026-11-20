@@ -9,7 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "auth:serve": "go run ./server serve",
-    "auth:create-user": "go run ./server create-user"
+    "auth:create-user": "go run ./server create-user",
+    "client:run": "cargo run --manifest-path client/Cargo.toml",
+    "client:check": "cargo check --manifest-path client/Cargo.toml"
   },
   "dependencies": {
     "@hookform/resolvers": "^7.0.7",

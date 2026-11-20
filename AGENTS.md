@@ -11,6 +11,8 @@
 - Create admin: `npm run auth:create-user -- <email> <password|->`
   (`-` reads password from stdin)
 - Auth service tests: `go test ./server/...`
+- Rust client: `npm run client:run` (egui/eframe desktop client in `client/`)
+- Rust client check: `npm run client:check`
 - No npm test script or CI workflow is configured.
 
 ## Project setup
@@ -24,6 +26,8 @@
   via Vite plugin; `src/index.css` uses `@import 'tailwindcss';`.
 - Path alias: `@/*` -> `./src/*` (configured in `vite.config.ts` and
   `tsconfig.app.json`); prefer `@/...` imports for app code when appropriate.
+- Rust GUI client lives in `client/` (egui/eframe + reqwest blocking client) and uses
+  an in-memory cookie jar against the same `/api` endpoints as the web admin.
 
 ## Conventions (repo-specific)
 
